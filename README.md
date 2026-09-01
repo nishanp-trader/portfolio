@@ -1,6 +1,6 @@
-# Jack — 3D Creator Portfolio
+# Nishan — Portfolio
 
-A dark-themed 3D creator portfolio landing page built with React, TypeScript, Tailwind CSS, and Framer Motion.
+A dark-themed portfolio landing page built with React, TypeScript, Tailwind CSS, and Framer Motion.
 
 ## Getting started
 
@@ -20,7 +20,8 @@ npm run preview
 
 ## Structure
 
-- `src/sections/` — HeroSection, MarqueeSection, AboutSection, ServicesSection, ProjectsSection
+- `src/sections/` — HeroSection, MarqueeSection, AboutSection, ServicesSection, WorkExperienceSection, ProjectsSection, GallerySection, FooterSection
+- `src/pages/` — GalleryPage
 - `src/components/` — FadeIn, Magnet, AnimatedText, ContactButton, LiveProjectButton
 - `src/index.css` — global styles, Kanit font import, `.hero-heading` gradient text class
 
