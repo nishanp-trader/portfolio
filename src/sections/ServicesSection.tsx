@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { LineChart, Share2, Target, Code2 } from 'lucide-react';
-import FadeIn from '../components/FadeIn';
+
 
 /* ─── Data ───────────────────────────────────────────── */
 const SERVICES = [
