@@ -56,10 +56,10 @@ export default function FooterSection() {
               Contact
             </p>
             <a
-              href="mailto:hello@nishan.com"
+              href="mailto:nishanbro5934@gmail.com"
               className="text-[#D7E2EA] text-sm uppercase tracking-wider hover:opacity-70 transition-opacity duration-200"
             >
-              hello@nishan.com
+              nishanbro5934@gmail.com
             </a>
             <div className="flex items-center gap-4">
               {SOCIALS.map(({ icon: Icon, href, label }) => (

@@ -7,8 +7,10 @@ import ServicesSection from './sections/ServicesSection';
 import WorkExperienceSection from './sections/WorkExperienceSection';
 import ProjectsSection from './sections/ProjectsSection';
 import GallerySection from './sections/GallerySection';
+import FaqSection from './sections/FaqSection';
 import FooterSection from './sections/FooterSection';
 import GalleryPage from './pages/GalleryPage';
+import ProcessSection from './sections/ProcessSection';
 
 export default function App() {
   const [galleryOpen, setGalleryOpen] = useState(false);
@@ -17,12 +19,14 @@ export default function App() {
     <>
       <div className="bg-[#0C0C0C]" style={{ overflowX: 'clip' }}>
         <HeroSection onGalleryOpen={() => setGalleryOpen(true)} />
-        <MarqueeSection />
         <AboutSection />
-        <ServicesSection />
         <WorkExperienceSection />
+        <ServicesSection />
+        <ProcessSection />
         <ProjectsSection />
         <GallerySection onViewAll={() => setGalleryOpen(true)} />
+        <FaqSection />
+        <MarqueeSection />
         <FooterSection />
       </div>
 

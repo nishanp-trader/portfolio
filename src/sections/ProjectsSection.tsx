@@ -276,25 +276,39 @@ export default function ProjectsSection() {
       className="relative bg-[#0C0C0C] rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] -mt-10 sm:-mt-12 md:-mt-14 z-10"
       style={{ height: `${(PROJECTS.length + 1) * 100}vh` }}
     >
-      <div className="sticky top-0 h-screen flex flex-col px-5 sm:px-8 md:px-10 pt-14 sm:pt-20 pb-10 gap-6 overflow-hidden">
-        {/* Centered column */}
-        <div className="flex flex-col gap-6 w-full max-w-[720px] mx-auto flex-1 min-h-0">
-          {/* Heading */}
-          <FadeIn delay={0} y={40} className="flex-shrink-0">
-            <div className="flex items-center justify-between">
+      <div className="sticky top-0 h-[100dvh] flex flex-col pt-14 sm:pt-20 pb-10 gap-6 overflow-hidden">
+        
+        {/* ── Heading (Full Width) ── */}
+        <div className="w-full px-5 sm:px-8 md:px-10 max-w-6xl mx-auto flex-shrink-0">
+          <FadeIn delay={0} y={40}>
+            <div className="flex items-end justify-between">
               <h2
                 className="hero-heading font-black uppercase leading-none tracking-tight"
                 style={{ fontSize: 'clamp(2.8rem, 9vw, 120px)' }}
               >
-                Project
+                Projects
               </h2>
-              <span className="text-[#D7E2EA] font-light uppercase tracking-widest text-sm opacity-40">
+              <span className="text-[#D7E2EA] font-light uppercase tracking-widest text-sm opacity-40 pb-1 hidden sm:block">
                 {String(PROJECTS.length).padStart(2, '0')} works
               </span>
             </div>
+            
+            <motion.div
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="mt-4 h-px"
+              style={{
+                background: 'linear-gradient(90deg, rgba(215,226,234,0.15), transparent)',
+                transformOrigin: 'left',
+              }}
+            />
           </FadeIn>
+        </div>
 
-          {/* Stack area */}
+        {/* ── Cards Area (Centered) ── */}
+        <div className="flex flex-col gap-6 w-full px-5 sm:px-8 md:px-10 max-w-[720px] mx-auto flex-1 min-h-0 mt-8 sm:mt-16 md:mt-24">
           <div className="relative flex-1 min-h-0">
             {PROJECTS.map((project, i) => (
               <StackCard
@@ -307,7 +321,7 @@ export default function ProjectsSection() {
             ))}
 
             {/* Progress dots — right edge of the centered column */}
-            <div className="absolute -right-6 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20">
+            <div className="absolute -right-2 sm:-right-8 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20">
               {PROJECTS.map((_, i) => (
                 <ProgressDot key={i} index={i} total={PROJECTS.length} progress={scrollYProgress} />
               ))}

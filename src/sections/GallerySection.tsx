@@ -53,7 +53,7 @@ export default function GallerySection({ onViewAll }: GallerySectionProps) {
   };
 
   return (
-    <section id="gallery" className="bg-[#0C0C0C] py-20 sm:py-24 md:py-32">
+    <section id="gallery" className="bg-[#0C0C0C] pt-0 pb-20 sm:pb-24 md:pb-32">
 
       {/* ── Everything shares the same horizontal padding ── */}
       <div className="px-5 sm:px-8 md:px-10">

@@ -1,6 +1,7 @@
-import { useRef } from 'react';
-import { motion, useInView, useScroll, useTransform, useSpring } from 'framer-motion';
+import { useState, useRef } from 'react';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { ExternalLink, Briefcase, Calendar } from 'lucide-react';
+
 
 /* ─── Data ───────────────────────────────────────────── */
 interface Experience {
@@ -14,6 +15,7 @@ interface Experience {
   accent: string;
   accentBg: string;
   objectives: string[];
+  flexDuration: number; // For the timeline graph
 }
 
 const EXPERIENCES: Experience[] = [
@@ -33,6 +35,7 @@ const EXPERIENCES: Experience[] = [
       'Created and maintained document retention schedules for timely and compliant disposal.',
       'Provided customer service by answering employee and client questions about documents.',
     ],
+    flexDuration: 18, // ~18 months
   },
   {
     period: '20 October 2021 – 15 January 2023',
@@ -52,10 +55,11 @@ const EXPERIENCES: Experience[] = [
       'Tracked and analysed social media metrics to measure campaign performance.',
       'Built and engaged with growing social media audiences.',
     ],
+    flexDuration: 15, // ~15 months
   },
   {
-    period: '25 January 2023 – Present',
-    current: true,
+    period: '25 Jan 2023 – 25 Feb 2023',
+    current: false,
     company: 'Job Track Manpower',
     location: 'Kathmandu',
     site: 'https://jobtrack.com.np/',
@@ -64,391 +68,354 @@ const EXPERIENCES: Experience[] = [
     accent: '#fbbf24',
     accentBg: 'rgba(251,191,36,0.07)',
     objectives: [
-      'Support company compliance with all applicable document management regulations.',
-      'Develop and implement new document management procedures to improve efficiency.',
-      'Train employees on document management procedures and best practices.',
-      'Maintain accurate records and ensure documentation accessibility across teams.',
+      'Supported company compliance with all applicable document management regulations.',
+      'Assisted in implementing document management procedures to improve efficiency.',
     ],
+    flexDuration: 3, // 1 month, bumped to 3 for visual clickability
   },
+  {
+    period: 'March 2023 – 25 Nov 2025',
+    current: false,
+    company: 'PMS JOB NEPAL',
+    location: 'Kathmandu',
+    site: '#',
+    siteLabel: 'pmsjobnepal.com',
+    position: 'Social Media Handler & Content Manager',
+    accent: '#f472b6',
+    accentBg: 'rgba(244,114,182,0.07)',
+    objectives: [
+      'Managed all social media profiles and executed growth strategies.',
+      'Created, curated, and managed all published digital content (images, video, written).',
+      'Monitored, listened, and responded to users in a social way while cultivating leads.',
+      'Analyzed key metrics and tweaked strategies as needed for optimal ROI.',
+    ],
+    flexDuration: 32, // ~32 months
+  },
+  {
+    period: '21 January 2026 – Present',
+    current: true,
+    company: 'Anjali Overseas Services',
+    location: 'Kathmandu',
+    site: '#',
+    siteLabel: 'anjalioverseas.com',
+    position: 'Documentation Officer / Digital Marketer',
+    accent: '#60a5fa',
+    accentBg: 'rgba(96,165,250,0.07)',
+    objectives: [
+      'Handle end-to-end documentation processing and compliance.',
+      'Lead digital marketing initiatives and manage all social media handles.',
+      'Develop content strategies to boost online presence and client engagement.',
+      'Streamline internal filing and digital record keeping systems.',
+    ],
+    flexDuration: 10, // ~10 months (present day)
+  }
 ];
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 const HEADING = 'Experience';
 
-/* ─── Card ───────────────────────────────────────────── */
-function TimelineCard({
-  exp,
-  index,
-  side,
+/* ─── Timeline Graph Component ───────────────────────── */
+function TimelineGraph({
+  activeIndex,
+  setActiveIndex
 }: {
-  exp: Experience;
-  index: number;
-  side: 'left' | 'right';
+  activeIndex: number;
+  setActiveIndex: (idx: number) => void;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-60px' });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, x: side === 'left' ? -56 : 56 }}
-      animate={inView ? { opacity: 1, x: 0 } : {}}
-      transition={{ duration: 0.6, delay: index * 0.1, ease: EASE }}
-      whileHover="hover"
-      className="w-full cursor-default"
-    >
-      <motion.div
-        variants={{
-          hover: {
-            y: -6,
-            boxShadow: `0 0 0 1px ${exp.accent}33, 0 20px 50px ${exp.accent}18`,
-          },
-        }}
-        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-        className="relative overflow-hidden rounded-[22px] sm:rounded-[26px] p-5 sm:p-7"
-        style={{
-          background: '#111111',
-          border: '1px solid rgba(215,226,234,0.13)',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
-        }}
-      >
-        {/* Accent top bar */}
-        <div
-          className="absolute top-0 left-0 right-0 h-[2px]"
-          style={{
-            background:
-              side === 'left'
-                ? `linear-gradient(90deg, transparent 40%, ${exp.accent})`
-                : `linear-gradient(90deg, ${exp.accent}, transparent 60%)`,
-          }}
-        />
-
-        {/* Ambient accent glow bottom */}
-        <div
-          className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
-          style={{
-            background: `radial-gradient(ellipse at ${side === 'left' ? '80%' : '20%'} 100%, ${exp.accent}0f 0%, transparent 70%)`,
-          }}
-        />
-
-        {/* Watermark number */}
-        <span
-          className="absolute right-4 top-3 font-black leading-none select-none pointer-events-none"
-          style={{ fontSize: 'clamp(4rem, 9vw, 6.5rem)', color: exp.accent, opacity: 0.05 }}
-          aria-hidden
-        >
-          {String(index + 1).padStart(2, '0')}
-        </span>
-
-        {/* Period */}
-        <div className="flex flex-wrap items-center gap-2 mb-3">
-          <Calendar className="w-3 h-3 flex-shrink-0 opacity-50" style={{ color: exp.accent }} />
-          <span className="text-[0.62rem] uppercase tracking-widest" style={{ color: exp.accent, opacity: 0.65 }}>
-            {exp.period}
-          </span>
-          {exp.current && (
-            <span
-              className="px-2 py-0.5 rounded-full text-[0.58rem] font-semibold uppercase tracking-wide"
-              style={{ background: exp.accentBg, color: exp.accent, border: `1px solid ${exp.accent}44` }}
-            >
-              Current
-            </span>
-          )}
-        </div>
-
-        {/* Company */}
-        <h3
-          className="font-black uppercase leading-tight tracking-tight mb-0.5"
-          style={{ fontSize: 'clamp(1rem, 2.4vw, 1.5rem)', color: '#D7E2EA' }}
-        >
-          {exp.company}
-        </h3>
-        <p className="text-[0.68rem] uppercase tracking-widest opacity-35 mb-3" style={{ color: '#D7E2EA' }}>
-          {exp.location}
-        </p>
-
-        {/* Position */}
-        <div className="flex items-center gap-2 mb-3">
-          <Briefcase className="w-3 h-3 flex-shrink-0" style={{ color: exp.accent }} />
-          <span className="font-medium uppercase tracking-wide" style={{ fontSize: '0.74rem', color: exp.accent }}>
-            {exp.position}
-          </span>
-        </div>
-
-        {/* Website */}
-        <a
-          href={exp.site}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 mb-5 hover:opacity-80 transition-opacity duration-200"
-          onClick={e => e.stopPropagation()}
-        >
-          <ExternalLink className="w-3 h-3" style={{ color: exp.accent, opacity: 0.55 }} />
-          <span className="text-[0.66rem] uppercase tracking-widest underline underline-offset-2" style={{ color: exp.accent, opacity: 0.55 }}>
-            {exp.siteLabel}
-          </span>
-        </a>
-
-        {/* Divider */}
-        <div className="h-px mb-4" style={{ background: 'rgba(215,226,234,0.07)' }} />
-
-        {/* Objectives — staggered reveal */}
-        <ul className="flex flex-col gap-2.5">
-          {exp.objectives.map((obj, i) => (
-            <motion.li
-              key={i}
-              initial={{ opacity: 0, x: 12 }}
-              animate={inView ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.4, delay: index * 0.1 + 0.25 + i * 0.07, ease: EASE }}
-              className="flex items-start gap-2.5"
-            >
-              <motion.span
-                className="flex-shrink-0 rounded-full"
-                style={{ background: exp.accent, width: 5, height: 5, marginTop: 8, opacity: 0.65 }}
-                initial={{ scale: 0 }}
-                animate={inView ? { scale: 1 } : {}}
-                transition={{ duration: 0.3, delay: index * 0.1 + 0.3 + i * 0.07, type: 'spring' }}
-              />
-              <p
-                className="font-light leading-relaxed opacity-60"
-                style={{ fontSize: 'clamp(0.76rem, 1.3vw, 0.88rem)', color: '#D7E2EA' }}
-              >
-                {obj}
-              </p>
-            </motion.li>
-          ))}
-        </ul>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-/* ─── Center dot ─────────────────────────────────────── */
-function TimelineDot({ exp, index }: { exp: Experience; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-40px' });
 
   return (
-    <div ref={ref} className="relative flex justify-center" style={{ paddingTop: 6 }}>
-      {/* Ambient glow behind dot */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0 }}
-        animate={inView ? { opacity: 1, scale: 1 } : {}}
-        transition={{ duration: 0.6, delay: index * 0.1, ease: EASE }}
-        className="absolute rounded-full"
-        style={{
-          width: 48, height: 48, top: -15, left: '50%', transform: 'translateX(-50%)',
-          background: exp.accent,
-          opacity: 0.12,
-          filter: 'blur(12px)',
-        }}
-      />
+    <div ref={ref} className="w-full flex flex-col gap-3 mb-10 sm:mb-14">
+      {/* ── Graph Bar ── */}
+      <div className="flex w-full h-3 sm:h-4 bg-[#111] rounded-full overflow-hidden" style={{ border: '1px solid rgba(215,226,234,0.1)' }}>
+        {EXPERIENCES.map((exp, i) => {
+          const isActive = i === activeIndex;
+          
+          return (
+            <motion.div
+              key={exp.company}
+              initial={{ scaleX: 0 }}
+              animate={inView ? { scaleX: 1 } : {}}
+              transition={{ duration: 0.8, delay: 0.3 + (i * 0.1), ease: EASE }}
+              className="group relative cursor-pointer h-full transition-all duration-300 hover:opacity-100"
+              style={{
+                transformOrigin: 'left',
+                flexGrow: exp.flexDuration,
+                background: isActive ? exp.accent : `${exp.accent}44`,
+                opacity: isActive ? 1 : 0.6,
+                borderRight: i < EXPERIENCES.length - 1 ? '1px solid #0c0c0c' : 'none'
+              }}
+              onClick={() => setActiveIndex(i)}
+            >
+              {/* Tooltip on hover */}
+              <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-[#111] text-[#D7E2EA] text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-md border border-[#D7E2EA]/10 z-10 hidden sm:block">
+                {exp.company}
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
 
-      {/* Outer ring */}
-      <motion.div
-        initial={{ scale: 0, opacity: 0 }}
-        animate={inView ? { scale: 1, opacity: 1 } : {}}
-        transition={{ duration: 0.5, delay: index * 0.1, type: 'spring', stiffness: 200, damping: 15 }}
-        className="relative z-10 rounded-full flex items-center justify-center"
-        style={{
-          width: 28, height: 28,
-          background: exp.accentBg,
-          border: `1.5px solid ${exp.accent}55`,
-        }}
-      >
-        {/* Inner dot */}
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={inView ? { scale: 1 } : {}}
-          transition={{ duration: 0.3, delay: index * 0.1 + 0.15, type: 'spring', stiffness: 400, damping: 15 }}
-          className="rounded-full"
-          style={{
-            width: 10, height: 10,
-            background: exp.accent,
-            boxShadow: `0 0 10px ${exp.accent}cc`,
-          }}
-        />
-
-        {/* Ping on current role */}
-        {exp.current && (
-          <span
-            className="absolute inset-0 rounded-full animate-ping"
-            style={{ background: exp.accent, opacity: 0.25 }}
-          />
-        )}
-      </motion.div>
+      {/* ── Year Markers ── */}
+      <div className="flex justify-between items-center text-[#D7E2EA] opacity-30 text-[9px] sm:text-[10px] font-medium uppercase tracking-widest px-1">
+        <span>2020</span>
+        <span>2021</span>
+        <span>2023</span>
+        <span>2024</span>
+        <span>2026 (Present)</span>
+      </div>
     </div>
   );
 }
 
 /* ─── Section ─────────────────────────────────────────── */
 export default function WorkExperienceSection() {
-  const sectionRef = useRef<HTMLElement>(null);
+  const [activeIndex, setActiveIndex] = useState(EXPERIENCES.length - 1); 
+  
   const headingRef = useRef<HTMLDivElement>(null);
   const headingInView = useInView(headingRef, { once: true, margin: '-40px' });
 
-  /* Scroll-driven spine draw */
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start 80%', 'end 60%'],
-  });
-  const rawSpine = useTransform(scrollYProgress, [0, 1], [0, 1]);
-  const spineScale = useSpring(rawSpine, { stiffness: 60, damping: 20 });
+  const activeJob = EXPERIENCES[activeIndex];
 
   return (
     <section
-      ref={sectionRef}
       id="experience"
       className="relative bg-[#0C0C0C] py-20 sm:py-24 md:py-32 px-5 sm:px-8 md:px-10 overflow-hidden"
     >
-      {/* Subtle section background radial glows */}
-      <div
+      {/* Dynamic ambient glow based on active job */}
+      <motion.div
         className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `
-            radial-gradient(ellipse 50% 30% at 20% 30%, rgba(52,211,153,0.04) 0%, transparent 70%),
-            radial-gradient(ellipse 40% 25% at 80% 60%, rgba(167,139,250,0.04) 0%, transparent 70%),
-            radial-gradient(ellipse 45% 30% at 50% 90%, rgba(251,191,36,0.04) 0%, transparent 70%)
-          `,
+        animate={{
+          background: `radial-gradient(ellipse 60% 50% at 50% 50%, ${activeJob.accent}07 0%, transparent 70%)`
         }}
+        transition={{ duration: 0.8, ease: EASE }}
       />
 
-      {/* ── Heading with letter-by-letter animation ── */}
-      <div ref={headingRef} className="max-w-5xl mx-auto mb-16 sm:mb-24">
-        <div className="flex items-end justify-between">
-          <h2
-            className="hero-heading font-black uppercase leading-none tracking-tight"
-            style={{ fontSize: 'clamp(2.8rem, 9vw, 120px)' }}
-            aria-label="Experience"
-          >
-            {HEADING.split('').map((char, i) => (
-              <motion.span
-                key={i}
-                initial={{ opacity: 0, y: 60, rotateX: -30 }}
-                animate={headingInView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
-                transition={{ duration: 0.5, delay: i * 0.04, ease: EASE }}
-                style={{ display: 'inline-block', transformOrigin: 'bottom' }}
-              >
-                {char}
-              </motion.span>
-            ))}
-          </h2>
-
-          <motion.span
-            initial={{ opacity: 0, x: 20 }}
-            animate={headingInView ? { opacity: 0.4, x: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.5, ease: EASE }}
-            className="text-[#D7E2EA] font-light uppercase tracking-widest text-sm pb-1"
-          >
-            {String(EXPERIENCES.length).padStart(2, '0')} roles
-          </motion.span>
+      <div className="max-w-6xl mx-auto relative z-10">
+        
+        {/* ── Heading ── */}
+        <div ref={headingRef} className="mb-10 sm:mb-16">
+          <div className="flex items-end justify-between">
+            <h2
+              className="hero-heading font-black uppercase leading-none tracking-tight"
+              style={{ fontSize: 'clamp(2.8rem, 9vw, 120px)' }}
+              aria-label="Experience"
+            >
+              {HEADING.split('').map((char, i) => (
+                <motion.span
+                  key={i}
+                  initial={{ opacity: 0, y: 60, rotateX: -30 }}
+                  animate={headingInView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
+                  transition={{ duration: 0.5, delay: i * 0.04, ease: EASE }}
+                  style={{ display: 'inline-block', transformOrigin: 'bottom' }}
+                >
+                  {char}
+                </motion.span>
+              ))}
+            </h2>
+            <motion.span
+              initial={{ opacity: 0, x: 20 }}
+              animate={headingInView ? { opacity: 0.4, x: 0 } : {}}
+              transition={{ duration: 0.5, delay: 0.5, ease: EASE }}
+              className="text-[#D7E2EA] font-light uppercase tracking-widest text-sm pb-1 hidden sm:block"
+            >
+              {String(EXPERIENCES.length).padStart(2, '0')} roles
+            </motion.span>
+          </div>
+          
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={headingInView ? { scaleX: 1 } : {}}
+            transition={{ duration: 0.8, delay: 0.4, ease: EASE }}
+            className="mt-4 h-px"
+            style={{
+              background: 'linear-gradient(90deg, rgba(215,226,234,0.15), transparent)',
+              transformOrigin: 'left',
+            }}
+          />
         </div>
 
-        {/* Animated underline */}
-        <motion.div
-          initial={{ scaleX: 0 }}
-          animate={headingInView ? { scaleX: 1 } : {}}
-          transition={{ duration: 0.8, delay: 0.4, ease: EASE }}
-          className="mt-4 h-px"
-          style={{
-            background: 'linear-gradient(90deg, rgba(215,226,234,0.15), transparent)',
-            transformOrigin: 'left',
-          }}
-        />
-      </div>
+        {/* ── Timeline Graph ── */}
+        <TimelineGraph activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
 
-      {/* ── Timeline ── */}
-      <div className="relative max-w-5xl mx-auto">
+        {/* ── Main Layout: Tabs (Left) + Details (Right) ── */}
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
+          
+          {/* Left: Tab List */}
+          <div className="w-full lg:w-[340px] flex-shrink-0 flex flex-col gap-2">
+            {EXPERIENCES.map((exp, index) => {
+              const isActive = index === activeIndex;
 
-        {/* Desktop center spine — scroll-driven draw */}
-        <motion.div
-          className="absolute hidden sm:block top-3 bottom-3 w-[1px]"
-          style={{
-            left: '50%',
-            translateX: '-50%',
-            scaleY: spineScale,
-            transformOrigin: 'top',
-            background:
-              'linear-gradient(to bottom, transparent, rgba(215,226,234,0.15) 8%, rgba(215,226,234,0.15) 92%, transparent)',
-          }}
-        />
+              return (
+                <button
+                  key={exp.company}
+                  onClick={() => setActiveIndex(index)}
+                  className="relative flex items-center text-left w-full p-4 sm:p-5 rounded-[18px] transition-all duration-300 group overflow-hidden"
+                  style={{
+                    background: isActive ? '#111111' : 'transparent',
+                    border: `1px solid ${isActive ? 'rgba(215,226,234,0.1)' : 'transparent'}`,
+                  }}
+                >
+                  {/* Hover/Active Highlight Line */}
+                  <motion.div
+                    className="absolute left-0 top-0 bottom-0 w-[3px]"
+                    initial={false}
+                    animate={{
+                      backgroundColor: isActive ? exp.accent : 'transparent',
+                      opacity: isActive ? 1 : 0
+                    }}
+                    transition={{ duration: 0.3 }}
+                  />
 
-        {/* Mobile left-side spine */}
-        <motion.div
-          className="absolute sm:hidden top-3 bottom-3 w-[1px]"
-          style={{
-            left: 13,
-            scaleY: spineScale,
-            transformOrigin: 'top',
-            background:
-              'linear-gradient(to bottom, transparent, rgba(215,226,234,0.13) 8%, rgba(215,226,234,0.13) 92%, transparent)',
-          }}
-        />
+                  {/* Active background glow */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTabGlow"
+                      className="absolute inset-0 pointer-events-none"
+                      style={{ background: `linear-gradient(90deg, ${exp.accent}11, transparent)` }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                    />
+                  )}
 
-        <div className="flex flex-col gap-14 sm:gap-20">
-          {EXPERIENCES.map((exp, i) => {
-            const isLeft = i % 2 === 0;
+                  <div className="flex flex-col gap-1 z-10 ml-2">
+                    <span 
+                      className="font-black uppercase tracking-wide leading-tight transition-colors duration-300"
+                      style={{ 
+                        fontSize: 'clamp(0.9rem, 1.5vw, 1.1rem)',
+                        color: isActive ? '#D7E2EA' : 'rgba(215,226,234,0.4)' 
+                      }}
+                    >
+                      {exp.company}
+                    </span>
+                    <span 
+                      className="text-[0.65rem] uppercase tracking-widest transition-colors duration-300"
+                      style={{ color: isActive ? exp.accent : 'rgba(215,226,234,0.25)' }}
+                    >
+                      {exp.period}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
 
-            return (
-              <div key={exp.company}>
-                {/* ── Desktop: 3-col grid ── */}
-                <div className="hidden sm:grid grid-cols-[1fr,56px,1fr] gap-6 items-start">
-                  {/* Left column */}
-                  <div>
-                    {isLeft ? (
-                      <TimelineCard exp={exp} index={i} side="left" />
-                    ) : (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: i * 0.1 + 0.3, duration: 0.5 }}
-                        className="flex justify-end pt-2"
+          {/* Right: Job Details Card */}
+          <div className="flex-1 min-h-[400px]">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeIndex}
+                initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
+                transition={{ duration: 0.3, ease: EASE }}
+                className="relative h-full flex flex-col p-6 sm:p-10 rounded-[28px] overflow-hidden"
+                style={{
+                  background: '#111111',
+                  border: '1px solid rgba(215,226,234,0.1)',
+                  boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                }}
+              >
+                {/* Accent Top Bar */}
+                <div
+                  className="absolute top-0 left-0 right-0 h-[2px]"
+                  style={{
+                    background: `linear-gradient(90deg, ${activeJob.accent}, transparent 80%)`,
+                  }}
+                />
+
+                {/* Ambient glow inside card */}
+                <div
+                  className="absolute top-0 left-0 w-[300px] h-[300px] pointer-events-none"
+                  style={{
+                    background: `radial-gradient(circle at top left, ${activeJob.accent}15 0%, transparent 70%)`,
+                  }}
+                />
+
+                {/* Header info */}
+                <div className="flex flex-col gap-5 mb-8 relative z-10">
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <h3
+                      className="font-black uppercase leading-tight tracking-tight"
+                      style={{ fontSize: 'clamp(1.4rem, 3vw, 2.2rem)', color: '#D7E2EA' }}
+                    >
+                      {activeJob.position}
+                    </h3>
+                    {activeJob.current && (
+                      <span
+                        className="px-3 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-wider"
+                        style={{
+                          background: activeJob.accentBg,
+                          color: activeJob.accent,
+                          border: `1px solid ${activeJob.accent}44`,
+                        }}
                       >
-                        <span
-                          className="text-[0.6rem] uppercase tracking-widest opacity-20 text-right leading-relaxed"
-                          style={{ color: '#D7E2EA', maxWidth: 150 }}
-                        >
-                          {exp.period}
-                        </span>
-                      </motion.div>
+                        Current Role
+                      </span>
                     )}
                   </div>
 
-                  {/* Center: dot */}
-                  <div>
-                    <TimelineDot exp={exp} index={i} />
-                  </div>
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+                    <div className="flex items-center gap-2">
+                      <Briefcase className="w-4 h-4 opacity-70" style={{ color: activeJob.accent }} />
+                      <span className="text-sm font-medium uppercase tracking-wide" style={{ color: '#D7E2EA' }}>
+                        {activeJob.company}
+                      </span>
+                    </div>
 
-                  {/* Right column */}
-                  <div>
-                    {!isLeft ? (
-                      <TimelineCard exp={exp} index={i} side="right" />
-                    ) : (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: i * 0.1 + 0.3, duration: 0.5 }}
-                        className="pt-2"
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 opacity-70" style={{ color: activeJob.accent }} />
+                      <span className="text-[0.7rem] uppercase tracking-widest opacity-60" style={{ color: '#D7E2EA' }}>
+                        {activeJob.period}
+                      </span>
+                    </div>
+
+                    {activeJob.site !== '#' && (
+                      <a
+                        href={activeJob.site}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
                       >
-                        <span
-                          className="text-[0.6rem] uppercase tracking-widest opacity-20 leading-relaxed"
-                          style={{ color: '#D7E2EA', maxWidth: 150, display: 'block' }}
-                        >
-                          {exp.period}
+                        <ExternalLink className="w-3.5 h-3.5" style={{ color: activeJob.accent }} />
+                        <span className="text-[0.7rem] uppercase tracking-widest underline underline-offset-4" style={{ color: activeJob.accent }}>
+                          {activeJob.siteLabel}
                         </span>
-                      </motion.div>
+                      </a>
                     )}
                   </div>
                 </div>
 
-                {/* ── Mobile: dot + card ── */}
-                <div className="sm:hidden grid grid-cols-[28px,1fr] gap-4 items-start">
-                  <TimelineDot exp={exp} index={i} />
-                  <TimelineCard exp={exp} index={i} side="right" />
-                </div>
-              </div>
-            );
-          })}
+                <div className="h-px w-full mb-8 relative z-10" style={{ background: 'rgba(215,226,234,0.08)' }} />
+
+                {/* Objectives */}
+                <ul className="flex flex-col gap-4 relative z-10">
+                  {activeJob.objectives.map((obj, i) => (
+                    <motion.li
+                      key={i}
+                      initial={{ opacity: 0, x: 10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: 0.2 + i * 0.08, ease: EASE }}
+                      className="flex items-start gap-4"
+                    >
+                      <span
+                        className="flex-shrink-0 rounded-full mt-[8px]"
+                        style={{ background: activeJob.accent, width: 6, height: 6, opacity: 0.8 }}
+                      />
+                      <p
+                        className="font-light leading-relaxed opacity-70"
+                        style={{ fontSize: 'clamp(0.85rem, 1.4vw, 1rem)', color: '#D7E2EA' }}
+                      >
+                        {obj}
+                      </p>
+                    </motion.li>
+                  ))}
+                </ul>
+                
+              </motion.div>
+            </AnimatePresence>
+          </div>
+          
         </div>
       </div>
     </section>
