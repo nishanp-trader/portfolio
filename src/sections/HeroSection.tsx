@@ -3,18 +3,18 @@ import ContactButton from '../components/ContactButton';
 
 const NAV_ITEMS = [
   { label: 'About',    href: '#about' },
-  { label: 'Gallery',  href: null },       // opens full gallery page
+  { label: 'Why Me',   href: '#why-me' },
   { label: 'Projects', href: '#projects' },
   { label: 'Contact',  href: '#contact' },
 ];
 
 interface HeroSectionProps {
-  onGalleryOpen: () => void;
+  onGalleryOpen?: () => void;
 }
 
 export default function HeroSection({ onGalleryOpen }: HeroSectionProps) {
   return (
-    <section className="h-screen flex flex-col" style={{ overflowX: 'clip' }}>
+    <section className="h-screen flex flex-col justify-between" style={{ overflowX: 'clip' }}>
       <FadeIn
         delay={0}
         y={-20}
@@ -67,7 +67,7 @@ export default function HeroSection({ onGalleryOpen }: HeroSectionProps) {
             className="text-[#D7E2EA] font-light uppercase tracking-wide leading-snug max-w-[160px] sm:max-w-[220px] md:max-w-[260px]"
             style={{ fontSize: 'clamp(0.75rem, 1.4vw, 1.5rem)' }}
           >
-            a trader, social media handler &amp; digital marketer building sharp digital experiences
+            a digital marketer, creative designer &amp; AI content creator building sharp digital experiences
           </p>
         </FadeIn>
 

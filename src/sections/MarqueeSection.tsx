@@ -26,6 +26,8 @@ const SKILLS = [
   { name: 'TypeScript', category: 'dev' },
   { name: 'Tailwind CSS', category: 'dev' },
   { name: 'Framer Motion', category: 'dev' },
+  { name: 'AI Content', category: 'creative' },
+  { name: 'Graphic Design', category: 'creative' },
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -33,6 +35,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   marketing: 'rgba(167, 139, 250, 0.15)', // violet tint
   social: 'rgba(251, 191, 36, 0.12)',     // amber tint
   dev: 'rgba(96, 165, 250, 0.15)',        // blue tint
+  creative: 'rgba(236, 72, 153, 0.15)',   // pink tint
 };
 
 const CATEGORY_BORDER: Record<string, string> = {
@@ -40,6 +43,7 @@ const CATEGORY_BORDER: Record<string, string> = {
   marketing: 'rgba(167, 139, 250, 0.35)',
   social:    'rgba(251, 191, 36, 0.3)',
   dev:       'rgba(96, 165, 250, 0.35)',
+  creative:  'rgba(236, 72, 153, 0.35)',
 };
 
 const CATEGORY_TEXT: Record<string, string> = {
@@ -47,6 +51,7 @@ const CATEGORY_TEXT: Record<string, string> = {
   marketing: '#a78bfa',
   social:    '#fbbf24',
   dev:       '#60a5fa',
+  creative:  '#ec4899',
 };
 
 /* ─── Animated counter ──────────────────────────────────── */
@@ -268,6 +273,7 @@ export default function MarqueeSection() {
             { label: 'Trading', category: 'trading' },
             { label: 'Marketing', category: 'marketing' },
             { label: 'Social', category: 'social' },
+            { label: 'Creative', category: 'creative' },
             { label: 'Dev', category: 'dev' },
           ].map(({ label, category }) => (
             <div key={label} className="flex items-center gap-2">

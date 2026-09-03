@@ -30,7 +30,7 @@ export default function FooterSection() {
             <p
               className="text-[#D7E2EA] font-light uppercase tracking-wide opacity-70 text-xs sm:text-sm"
             >
-              Trader · Social Media Handler · Digital Marketer · Front-End Developer
+              Digital Marketer · Graphic Designer · AI Content Creator · Social Media Handler
             </p>
           </div>
 

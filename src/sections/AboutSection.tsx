@@ -1,6 +1,18 @@
 import FadeIn from '../components/FadeIn';
 import AnimatedText from '../components/AnimatedText';
-import ContactButton from '../components/ContactButton';
+import SocialFlipButton from '../components/SocialFlipButton';
+import { FaGithub, FaInstagram, FaLinkedin, FaEnvelope, FaWhatsapp } from 'react-icons/fa';
+import type { SocialItem } from '../components/SocialFlipButton';
+
+const socialItems: SocialItem[] = [
+  { letter: "C", icon: <FaEnvelope />,   label: "Email",       href: "mailto:your@email.com" },
+  { letter: "O", icon: <FaLinkedin />,   label: "LinkedIn",    href: "https://linkedin.com" },
+  { letter: "N", icon: <FaInstagram />,  label: "Instagram",   href: "https://instagram.com" },
+  { letter: "T", icon: <FaGithub />,     label: "GitHub",      href: "https://github.com" },
+  { letter: "A", icon: <FaWhatsapp />,   label: "WhatsApp",    href: "https://wa.me/" },
+  { letter: "C", icon: <span className="text-base font-bold">✕</span>, label: "X (Twitter)", href: "https://x.com" },
+  { letter: "T", icon: <FaEnvelope />,   label: "Contact",     href: "mailto:your@email.com" },
+];
 
 export default function AboutSection() {
   return (
@@ -76,12 +88,14 @@ export default function AboutSection() {
 
         <div className="flex flex-col items-center gap-16 sm:gap-20 md:gap-24">
           <AnimatedText
-            text="I work across trading, social media management, digital marketing, and front-end development, i enjoy blending data-driven thinking with creative execution. Let's build something incredible together!"
+            text="I work across digital marketing, AI content creation, graphic design, and social media management. I enjoy blending data-driven strategy with high-impact creative execution. Let's build something incredible together!"
             className="text-[#D7E2EA] font-medium text-center leading-relaxed max-w-[560px]"
             style={{ fontSize: 'clamp(1rem, 2vw, 1.35rem)' }}
           />
 
-          <ContactButton />
+          <FadeIn delay={0.2} y={30}>
+            <SocialFlipButton items={socialItems} />
+          </FadeIn>
         </div>
       </div>
     </section>
